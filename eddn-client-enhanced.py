@@ -50,7 +50,7 @@ def main():
  
                 if __message == False:
                     subscriber.disconnect(__relayEDDN)
-                    print 'Disconnect from EDDN'
+                    print 'Disconnect from EDDN (1)'
                     break
  
                 __message   = zlib.decompress(__message)
@@ -61,7 +61,7 @@ def main():
         except zmq.ZMQError, e:
             print 'ZMQSocketException: ' + str(e)
             subscriber.disconnect(__relayEDDN)
-            print 'Disconnect from EDDN'
+            print 'Disconnect from EDDN (2)'
             time.sleep(10)
  
  
