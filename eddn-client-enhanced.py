@@ -21,17 +21,17 @@ def date(__format):
     d = datetime.datetime.utcnow()
     return d.strftime(__format)
  
-def echoLogJSON(__json):
+def echoLogJSON(__message, __json):
     global __logJSONFile
  
     __logJSONFileParsed = __logJSONFile.replace('%DATE%', str(date('%Y-%m-%d')))
  
-    print __json
-    sys.stdout.flush()
- 
     f = open(__logJSONFileParsed, 'a')
-    f.write(str(__json) + '\n')
+    f.write(str(__message) + '\n')
     f.close()
+ 
+    print __json['gatewayTimestamp'] + ',' + __json['softwareName'] + ',' + __json['softwareVersion'] + ',' + __json['uploaderID']
+    sys.stdout.flush()
  
  
 def main():
@@ -57,7 +57,7 @@ def main():
                         __message   = zlib.decompress(__message)
                         __json      = simplejson.loads(__message)
          
-                        echoLogJSON(__message)
+                        echoLogJSON(__message, __json)
                 else:
                     print 'Disconnect from EDDN (After timeout)'
                     sys.stdout.flush()
