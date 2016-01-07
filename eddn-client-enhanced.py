@@ -43,7 +43,7 @@ def main():
     while True:
         try:
             subscriber.connect(__relayEDDN)
-            print 'Connect to EDDN'
+            print datetime.datetime.utcnow().isoformat() + ',Connect to EDDN'
             sys.stdout.flush()
             
             poller = zmq.Poller()
@@ -59,15 +59,15 @@ def main():
          
                         echoLogJSON(__message, __json)
                 else:
-                    print 'Disconnect from EDDN (After timeout)'
+                    print datetime.datetime.utcnow().isoformat() + ',Disconnect from EDDN (After timeout)'
                     sys.stdout.flush()
                     
                     subscriber.disconnect(__relayEDDN)
                     break
  
         except zmq.ZMQError, e:
-            print 'Disconnect from EDDN (After receiving ZMQError)'
-            print 'ZMQSocketException: ' + str(e)
+            print datetime.datetime.utcnow().isoformat() + ',Disconnect from EDDN (After receiving ZMQError)'
+            print datetime.datetime.utcnow().isoformat() + ',ZMQSocketException: ' + str(e)
             sys.stdout.flush()
             
             subscriber.disconnect(__relayEDDN)
