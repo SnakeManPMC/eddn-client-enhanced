@@ -7,7 +7,7 @@ import sys, os, datetime, time
 "  Configuration
 """
 __relayEDDN             = 'tcp://eddn-relay.elite-markets.net:9500'
-__timeoutEDDN           = 600000
+__timeoutEDDN           = 60000 # 10 minuts
  
 __logJSONFile           = 'eddn_%DATE%.txt'
  
@@ -43,12 +43,14 @@ def main():
     while True:
         try:
             subscriber.connect(__relayEDDN)
+            print 'Connect to EDDN'
  
             while True:
                 __message   = subscriber.recv()
  
                 if __message == False:
                     subscriber.disconnect(__relayEDDN)
+                    print 'Disconnect from EDDN'
                     break
  
                 __message   = zlib.decompress(__message)
@@ -57,7 +59,9 @@ def main():
                 echoLogJSON(__message)
  
         except zmq.ZMQError, e:
+            print 'ZMQSocketException: ' + str(e)
             subscriber.disconnect(__relayEDDN)
+            print 'Disconnect from EDDN'
             time.sleep(10)
  
  
