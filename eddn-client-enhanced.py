@@ -30,7 +30,7 @@ def echoLogJSON(__message, __json):
     f.write(str(__message) + '\n')
     f.close()
  
-    print __json['gatewayTimestamp'] + ',' + __json['softwareName'] + ',' + __json['softwareVersion'] + ',' + __json['uploaderID']
+    print __json['header']['gatewayTimestamp'] + ',' + __json['header']['softwareName'] + ',' + __json['header']['softwareVersion'] + ',' + __json['header']['uploaderID']
     sys.stdout.flush()
  
  
