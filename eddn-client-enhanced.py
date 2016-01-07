@@ -21,18 +21,17 @@ def date(__format):
     d = datetime.datetime.utcnow()
     return d.strftime(__format)
  
-def echoLogJSON(__json):
+def echoLogJSON(__message, __json):
     global __logJSONFile
  
     __logJSONFileParsed = __logJSONFile.replace('%DATE%', str(date('%Y-%m-%d')))
  
-    print 'Receiving message'
-    #print __json
-    sys.stdout.flush()
- 
     f = open(__logJSONFileParsed, 'a')
-    f.write(str(__json) + '\n')
+    f.write(str(__message) + '\n')
     f.close()
+ 
+    print __json['header']['gatewayTimestamp'] + ',' + __json['header']['softwareName'] + ',' + __json['header']['softwareVersion'] + ',' + __json['header']['uploaderID']
+    sys.stdout.flush()
  
  
 def main():
@@ -58,18 +57,20 @@ def main():
                         __message   = zlib.decompress(__message)
                         __json      = simplejson.loads(__message)
          
-                        echoLogJSON(__message)
+                        echoLogJSON(__message, __json)
                 else:
-                    subscriber.disconnect(__relayEDDN)
-                    print 'Disconnect from EDDN (1)'
+                    print 'Disconnect from EDDN (After timeout)'
                     sys.stdout.flush()
+                    
+                    subscriber.disconnect(__relayEDDN)
                     break
  
         except zmq.ZMQError, e:
+            print 'Disconnect from EDDN (After receiving ZMQError)'
             print 'ZMQSocketException: ' + str(e)
-            subscriber.disconnect(__relayEDDN)
-            print 'Disconnect from EDDN (2)'
             sys.stdout.flush()
+            
+            subscriber.disconnect(__relayEDDN)
             time.sleep(10)
  
  
