@@ -26,8 +26,7 @@ def echoLogJSON(__json):
  
     __logJSONFileParsed = __logJSONFile.replace('%DATE%', str(date('%Y-%m-%d')))
  
-    print 'Receiving message'
-    #print __json
+    print __json
     sys.stdout.flush()
  
     f = open(__logJSONFileParsed, 'a')
@@ -44,8 +43,6 @@ def main():
     while True:
         try:
             subscriber.connect(__relayEDDN)
-            print 'Connect to EDDN'
-            sys.stdout.flush()
             
             poller = zmq.Poller()
             poller.register(subscriber, zmq.POLLIN)
@@ -61,15 +58,11 @@ def main():
                         echoLogJSON(__message)
                 else:
                     subscriber.disconnect(__relayEDDN)
-                    print 'Disconnect from EDDN (1)'
-                    sys.stdout.flush()
                     break
  
         except zmq.ZMQError, e:
             print 'ZMQSocketException: ' + str(e)
             subscriber.disconnect(__relayEDDN)
-            print 'Disconnect from EDDN (2)'
-            sys.stdout.flush()
             time.sleep(10)
  
  
