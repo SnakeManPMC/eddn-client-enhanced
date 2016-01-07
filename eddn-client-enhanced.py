@@ -8,7 +8,7 @@ import sys, os, datetime, time
 """
 __relayEDDN             = 'tcp://eddn-relay.elite-markets.net:9500'
 #__timeoutEDDN           = 600000 # 10 minuts
-__timeoutEDDN           = 1000 # 1 second
+__timeoutEDDN           = 60000 # 1 minut
  
 __logJSONFile           = 'eddn_%DATE%.txt'
  
@@ -26,6 +26,7 @@ def echoLogJSON(__json):
  
     __logJSONFileParsed = __logJSONFile.replace('%DATE%', str(date('%Y-%m-%d')))
  
+    print 'Receiving message'
     #print __json
     sys.stdout.flush()
  
@@ -39,27 +40,30 @@ def main():
     subscriber  = context.socket(zmq.SUB)
  
     subscriber.setsockopt(zmq.SUBSCRIBE, "")
-    subscriber.setsockopt(zmq.RCVTIMEO, __timeoutEDDN)
- 
+    
     while True:
         try:
             subscriber.connect(__relayEDDN)
             print 'Connect to EDDN'
             sys.stdout.flush()
+            
+            poller = zmq.Poller()
+            poller.register(subscriber, zmq.POLLIN)
  
             while True:
-                __message   = subscriber.recv()
- 
-                if __message == False:
+                socks = dict(poller.poll(__timeoutEDDN))
+                if socks:
+                    if socks.get(subscriber) == zmq.POLLIN:
+                        __message   = subscriber.recv(zmq.NOBLOCK)
+                        __message   = zlib.decompress(__message)
+                        __json      = simplejson.loads(__message)
+         
+                        echoLogJSON(__message)
+                else:
                     subscriber.disconnect(__relayEDDN)
                     print 'Disconnect from EDDN (1)'
                     sys.stdout.flush()
                     break
- 
-                __message   = zlib.decompress(__message)
-                __json      = simplejson.loads(__message)
- 
-                echoLogJSON(__message)
  
         except zmq.ZMQError, e:
             print 'ZMQSocketException: ' + str(e)
